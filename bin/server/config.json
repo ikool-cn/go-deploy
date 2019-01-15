@@ -1,0 +1,82 @@
+{
+  "listen_http": ":8080",
+  "listen_tcp": ":8081",
+  "apps": [
+    {
+      "name": "app1",
+      "node": [
+        {
+          "ip": "127.0.0.1",
+          "type": "svn",
+          "path": "/data/wwwroot/app1",
+          "befor_deploy": "ls /data",
+          "after_deploy": "ls /home"
+        },
+        {
+          "ip": "192.168.1.207",
+          "type": "svn",
+          "path": "/data/wwwroot/app1",
+          "befor_deploy": "ls /data",
+          "after_deploy": "ls /home"
+        }
+      ]
+    },
+    {
+      "name": "app2",
+      "node": [
+        {
+          "ip": "10.0.0.101",
+          "type": "svn",
+          "path": "/data/wwwroot/app2",
+          "befor_deploy": "",
+          "after_deploy": ""
+        },
+        {
+          "ip": "10.0.0.102",
+          "type": "svn",
+          "path": "/data/wwwroot/app2",
+          "befor_deploy": "",
+          "after_deploy": ""
+        },
+        {
+          "ip": "10.0.0.103",
+          "type": "svn",
+          "path": "/data/wwwroot/app2",
+          "befor_deploy": "",
+          "after_deploy": ""
+        }
+      ]
+    },
+    {
+      "name": "app3-test",
+      "node": [
+        {
+          "ip": "10.0.0.101",
+          "type": "svn",
+          "path": "/data/wwwroot/app2",
+          "befor_deploy": "",
+          "after_deploy": ""
+        }
+      ]
+    },
+    {
+      "name": "app3-online",
+      "node": [
+        {
+          "ip": "10.0.0.101",
+          "type": "svn",
+          "path": "/data/wwwroot/app3",
+          "befor_deploy": "",
+          "after_deploy": ""
+        },
+        {
+          "ip": "10.0.0.102",
+          "type": "svn",
+          "path": "/data/wwwroot/app3",
+          "befor_deploy": "",
+          "after_deploy": ""
+        }
+      ]
+    }
+  ]
+}
