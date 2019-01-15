@@ -14,20 +14,23 @@ Deploy code to cluster servers based on svn, onekey update onekey rollback
 
 ### 部署流程
 
- - 所有的目标机器使用svn预先部署好环境，假设web运行的账号为www
+ - 所有的client目标机器使用svn预先部署好环境，假设web运行的账号为www
 
     ```
     su www
     svn co svn://1.2.3.4/app /data/wwwroot/app
-    svn up 请确保这一步可以免密登陆```
+    cd /data/wwwroot/app
+    svn up
+    #请确保这一步可以免密登陆
+    ```
 
- - 请确保www拥有shell权限
+ - 请确保www账号拥有shell权限
     ```
     cat /etc/passwd|grep www 
     www:x:501:501::/home/www:/bin/bash
     ```
 
- - 配置config.json
+ - 配置config.json，添加应用和client节点
 
  - 使用www账号启动server，把config.json和server在相同的目录。
     ```
@@ -37,10 +40,10 @@ Deploy code to cluster servers based on svn, onekey update onekey rollback
  - 打开浏览器请确保http://x.x.x.:http_port可以正常访问
 
  - client端部署，同样使用web账号www运行
-      ```
-        su www
-        ./pathto/client -s serverIP:serverTcpPort
-      ```
+    ```
+   su www
+   ./pathto/client -s serverIP:serverTcpPort
+    ```
 ok! 至此就部署完毕了，打开浏览器测试一下把。
 
 ### web访问安全问题
