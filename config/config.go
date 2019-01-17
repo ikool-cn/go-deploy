@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"net"
+	"os"
+	"github.com/bwmarrin/snowflake"
 )
 
 type Config struct {
@@ -16,6 +18,7 @@ type Config struct {
 type Apps struct {
 	GroupId string `json:"groupid,omitempty"`
 	Name    string `json:"name"`
+	Url     string `json:"url"`
 	Node    []Node `json:"node"`
 }
 
@@ -27,6 +30,21 @@ type Node struct {
 	AfterDeploy string   `json:"after_deploy"`
 	Online      bool     `json:"online,omitempty"`
 	Conn        net.Conn `json:"-"`
+}
+
+var C *Config
+
+func init() {
+	root, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	file := filepath.Join(root, "config.json")
+	C = New(file)
+	node, err := snowflake.NewNode(1)
+	if err != nil {
+		panic(err)
+	}
+	for key := range C.Apps {
+		C.Apps[key].GroupId = node.Generate().String()
+	}
 }
 
 func New(file string) *Config {

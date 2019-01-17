@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"os"
 	"encoding/json"
-	"os/exec"
 	"strings"
+	"go-deploy/helper"
 )
 
 var usage = `Usage: /data/pathto/client -s 127.0.0.1:8081`
@@ -98,21 +98,11 @@ func processAction(message string) {
 
 	if command != "" {
 		if strings.TrimSpace(msg.BeforDeploy) != "" {
-			runShell(msg.BeforDeploy)
+			helper.RunShell(msg.BeforDeploy)
 		}
-		runShell(command)
+		helper.RunShell(command)
 		if strings.TrimSpace(msg.AfterDeploy) != "" {
-			runShell(msg.AfterDeploy)
+			helper.RunShell(msg.AfterDeploy)
 		}
 	}
-}
-
-func runShell(command string) {
-	//cmd := exec.Command("/bin/bash", "-c", `ps -eaf|grep "nginx: master"|grep -v "grep"|awk '{print $2}'`)
-	cmd := exec.Command("/bin/sh", "-c", command)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Start()
-	cmd.Run()
-	cmd.Wait()
 }
