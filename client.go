@@ -3,7 +3,6 @@ package main
 import (
 	"net"
 	"bufio"
-	"time"
 	"log"
 	"flag"
 	"fmt"
@@ -11,10 +10,13 @@ import (
 	"encoding/json"
 	"strings"
 	"go-deploy/helper"
+	"time"
+	"errors"
+	"bytes"
 )
 
-var usage = `Usage: /data/pathto/client -s 127.0.0.1:8081`
-var serverAddr *string
+var listening *string
+var usage = `Usage: /pathto/client -l :8081`
 
 type Message struct {
 	Type        string `json:"type"`
@@ -29,64 +31,82 @@ func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
 	}
-	serverAddr = flag.String("s", "127.0.0.1:8081", "server address")
+	listening = flag.String("l", ":8081", usage)
 	flag.Parse()
-	if *serverAddr == "" {
+	if *listening == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
+	//start tcp server
+	log.Printf("Start tcp server listening %s", *listening)
+	ln, err := net.Listen("tcp", *listening)
+	if err != nil {
+		log.Println("Error listening:", err)
+		os.Exit(1)
+	}
+	defer ln.Close()
+
+	// run loop forever (or until ctrl-c)
 	for {
-		connectServer()
-		time.Sleep(time.Second * 5)
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Println("Error accepting: ", err)
+			continue
+		}
+		log.Printf("Received new connection %s -> %s \n", conn.RemoteAddr(), conn.LocalAddr())
+		go handleConn(conn)
 	}
 }
 
-func connectServer() {
-	// connect to this socket
-	conn, err := net.Dial("tcp", *serverAddr)
-	if err != nil {
-		log.Println("Error connect to server:", err)
-		return
-	}
+func handleConn(conn net.Conn) {
 	defer conn.Close()
-	go handleServer(conn)
-
-	ticker := time.Tick(time.Second * 15)
 	for {
-		select {
-		case <-ticker:
+		// will listen for message to process ending in newline (\n)
+		message, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			log.Println("Server closed", err.Error())
+			break
+		}
+		// output message received
+		log.Print("Message Received:", message)
+
+		if strings.TrimSpace(message) == "PING" {
+			message = "PONG"
+			// send new string back to client
 			conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
-			_, err := conn.Write([]byte("PING\n"))
+			_, err = conn.Write([]byte(message + "\n"))
 			if err != nil {
 				log.Println("Error writing to stream.", err)
-				return
+				break
+			}
+		} else {
+			ret, err := processAction(message)
+			if err != nil {
+				log.Println("Process error", err)
+				ret = []byte(err.Error())
+			}
+
+			//replace \n with special chars
+			ret = bytes.Replace(ret, []byte{10}, []byte("{CRLF}"), -1)
+			ret = append(ret, '\n')
+			conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
+			_, err = conn.Write(ret)
+			if err != nil {
+				log.Println("Error writing to stream:", err)
+				break
 			}
 		}
 	}
 }
 
-func handleServer(conn net.Conn) {
-	defer conn.Close()
-	for {
-		message, err := bufio.NewReader(conn).ReadString('\n')
-		if err != nil {
-			log.Println("Server closed", err.Error())
-			return
-		}
-		log.Print("Message received from server: " + message)
-		if message != "PONG\n" {
-			go processAction(message)
-		}
-	}
-}
-
-func processAction(message string) {
+//process task
+func processAction(message string) ([]byte, error) {
 	msg := &Message{}
 	err := json.Unmarshal([]byte(message), msg)
 	if err != nil {
 		log.Print("Json decode error: " + err.Error())
-		return
+		return nil, err
 	}
 
 	var command string
@@ -97,12 +117,39 @@ func processAction(message string) {
 	}
 
 	if command != "" {
+		bytes := make([]byte, 0)
+
+		//exec pre script
 		if strings.TrimSpace(msg.BeforDeploy) != "" {
-			helper.RunShell(msg.BeforDeploy)
+			log.Println("exec pre command:", command)
+			byt, err := helper.RunShell(msg.BeforDeploy)
+			if err != nil {
+				return nil, err
+			} else {
+				bytes = append(bytes, byt...)
+			}
 		}
-		helper.RunShell(command)
+
+		//exec command
+		log.Println("exec command:", command)
+		byt, err := helper.RunShell(command)
+		if err != nil {
+			return nil, err
+		} else {
+			bytes = append(bytes, byt...)
+		}
+
+		//exec post script
 		if strings.TrimSpace(msg.AfterDeploy) != "" {
-			helper.RunShell(msg.AfterDeploy)
+			log.Println("exec post command:", command)
+			byt, err := helper.RunShell(msg.AfterDeploy)
+			if err != nil {
+				return nil, err
+			} else {
+				bytes = append(bytes, byt...)
+			}
 		}
+		return bytes, nil
 	}
+	return nil, errors.New("command invalid")
 }

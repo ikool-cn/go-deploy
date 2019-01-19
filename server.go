@@ -1,15 +1,13 @@
 package main
 
 import (
-	"net"
-	"os"
-	"bufio"
-	"strings"
 	"time"
 	"log"
 	"net/http"
-	"go-deploy/config"
 	"go-deploy/ctrl"
+	"go-deploy/config"
+	"net"
+	"bufio"
 )
 
 func main() {
@@ -31,91 +29,73 @@ func main() {
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
 			log.Println(err)
-		} else {
-
 		}
 	}()
 
-	//start tcp server
-	log.Printf("Start tcp server listening %s", config.C.ListenTcp)
-	ln, err := net.Listen("tcp", config.C.ListenTcp)
-	if err != nil {
-		log.Println("Error listening:", err)
-		os.Exit(1)
+	for addr := range config.C.UniqAddr {
+		go Ping(addr)
 	}
-	defer ln.Close()
 
-	// run loop forever (or until ctrl-c)
+	//block
+	ticker := time.Tick(time.Second * 10)
 	for {
-		conn, err := ln.Accept()
-		if err != nil {
-			log.Println("Error accepting: ", err)
-			continue
+		select {
+		case <-ticker:
 		}
-		log.Printf("Received new connection %s -> %s \n", conn.RemoteAddr(), conn.LocalAddr())
-		go handleClient(conn)
 	}
 }
 
-func handleClient(conn net.Conn) {
-	defer conn.Close()
-	if !checkAllowedConn(conn) {
-		return
-	} else {
-		setClientStatus(conn, true)
-	}
+func Ping(addr string) {
 	for {
-		// will listen for message to process ending in newline (\n)
-		message, err := bufio.NewReader(conn).ReadString('\n')
-		if err != nil {
-			log.Println("Client closed", err.Error())
-			break
-		}
-		// output message received
-		log.Print(conn.RemoteAddr(), " -> Message Received:", message)
-		//keepalive
-		if strings.TrimSpace(message) == "PING" {
-			message = "PONG"
-		}
-		// send new string back to client
-		conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
-		_, err = conn.Write([]byte(message + "\n"))
-		if err != nil {
-			log.Println("Error writing to stream.", err)
-			break
-		}
-	}
-	setClientStatus(conn, false)
-}
-
-//check connection whether to allow
-func checkAllowedConn(conn net.Conn) bool {
-	ip, _, _ := net.SplitHostPort(conn.RemoteAddr().String())
-	for _, app := range config.C.Apps {
-		for _, node := range app.Node {
-			if node.Ip == ip {
-				if node.Online {
-					return false
-				}
-				return true
+		func() {
+			// connect to this socket
+			conn, err := net.Dial("tcp", addr)
+			if err != nil {
+				log.Println("Error connect to client:", err)
+				return
 			}
-		}
+			setClientOnlineStatus(addr, true)
+			defer func() {
+				setClientOnlineStatus(addr, false)
+				conn.Close()
+			}()
+
+			//read message from client
+			go func(conn net.Conn) {
+				defer conn.Close()
+				for {
+					message, err := bufio.NewReader(conn).ReadString('\n')
+					if err != nil {
+						log.Println("Client closed", err.Error())
+						return
+					}
+					log.Print(conn.RemoteAddr(), " -> Message Received from client:", message)
+				}
+			}(conn)
+
+			ticker := time.Tick(time.Second * 15)
+			for {
+				select {
+				case <-ticker:
+					conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
+					_, err := conn.Write([]byte("PING\n"))
+					if err != nil {
+						log.Println("Error writing to stream:", err)
+						return
+					}
+				}
+			}
+		}()
+		time.Sleep(time.Second * 5)
 	}
-	return false
 }
 
 //set client online or offline
-func setClientStatus(conn net.Conn, online bool) {
-	ip, _, _ := net.SplitHostPort(conn.RemoteAddr().String())
+func setClientOnlineStatus(addr string, online bool) {
 	for key, app := range config.C.Apps {
 		for k, node := range app.Node {
-			if node.Ip == ip {
+			if node.Addr == addr {
 				config.C.Apps[key].Node[k].Online = online
-				if online {
-					config.C.Apps[key].Node[k].Conn = conn
-				} else {
-					config.C.Apps[key].Node[k].Conn = nil
-				}
 			}
 		}
 	}

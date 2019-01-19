@@ -11,6 +11,7 @@ func GetIndexTpl() string {
         table, th, td {border: 1px solid gray; padding: 3px;}
         .reversion{width: 120px;}
         .title {width: 100%;margin: 0 auto;text-align: center; margin-bottom: 0;}
+        .clearlog{float: right;font-size: 10px;}
     </style>
     <script src="https://zeptojs.com/zepto.min.js"></script>
 </head>
@@ -27,8 +28,8 @@ func GetIndexTpl() string {
     <tbody class="list">
     </tbody>
     <tfoot>
-        <tr><td colspan="5" style="text-align: center;"><span style="color: green">● online</span> <span style="color: red">● offline</span></td></tr>
-        <tr><td colspan="5"><textarea id="log" style="width: 99%; height: 200px;"></textarea></td></tr>
+        <tr><td colspan="5" style="text-align: center;"><span style="color: green">● online</span> <span style="color: red">● offline</span><span class="clearlog"><a href="javascript:void(0);">clear</a></span></td></tr>
+        <tr><td colspan="5"><textarea spellcheck="false" id="log" style="width: 99%; height: 200px;"></textarea></td></tr>
     </tfoot>
 </table>
 <script>
@@ -60,9 +61,9 @@ func GetIndexTpl() string {
         var html = '';
         $.each(json, function (index, item) {
             if (typeof item.online != 'undefined' && item.online) {
-                html += '<span style="color: green">' + item.ip + '●</span> ';
+                html += '<span title="' + item.addr + '" style="color: green">' + item.alias + '●</span> ';
             } else {
-                html += '<span style="color: red">' + item.ip + '●</span> ';
+                html += '<span title="' + item.addr + '" style="color: red">' + item.alias + '●</span> ';
             }
         });
         return html;
@@ -75,14 +76,19 @@ func GetIndexTpl() string {
             dataType: "json",
             data: {"groupid": groupid},
             success: function (json) {
-                if (json.Status == true) {
-                    var option = '';
-                    $.each(json.Data, function (index, item) {
-                        option += '<option value="' + item.Reversion + '">r' + item.Reversion + ' | ' + item.Author + ' | ' + item.Time + ' | ' + item.Content + '</option>' + "\n";
-                    });
-                    $('.gid' + groupid).find('.reversion').html(option)
+                if (typeof json.Status != 'undefined') {
+                    if (json.Status == true) {
+                        var option = '';
+                        $.each(json.Data, function (index, item) {
+                            option += '<option value="' + item.Reversion + '">r' + item.Reversion + ' | ' + item.Author + ' | ' + item.Time + ' | ' + item.Content + '</option>' + "\n";
+                        });
+                        $('.gid' + groupid).find('.reversion').html(option)
+                    } else {
+                        log(groupid, json.Msg)
+                    }
                 } else {
-                    log(groupid, json.Msg)
+                    console.log(json);
+                    alert('网络错误');
                 }
             }
         })
@@ -90,40 +96,62 @@ func GetIndexTpl() string {
 
     function log(groupid, msg) {
         var tr = $('.gid' + groupid);
-        console.log(tr)
         var name = tr.find('td').eq(1).text();
         $('#log').prepend('[' + name + '] ' + msg);
     }
 
+    $('.clearlog').on('click', function () {
+        $('#log').empty();
+    })
+
     $(document).on('click', '.deploy', function () {
-        var id = $(this).closest('tr').data('id');
+        var groupid = $(this).closest('tr').data('id');
         $.ajax({
             url: "/deply",
             type: "POST",
             dataType: "json",
-            data: {"groupid": id},
+            data: {"groupid": groupid},
             success: function (json) {
-
+                if (typeof json.Status != 'undefined') {
+                    if (json.Status == true) {
+                        log(groupid, json.Data)
+                    } else {
+                        log(groupid, json.Msg)
+                    }
+                } else {
+                    console.log(json);
+                    alert('网络错误');
+                }
             }
         })
     });
 
     $(document).on('click', '.rollback', function () {
-        var id = $(this).closest('tr').data('id');
+        var groupid = $(this).closest('tr').data('id');
         var reversion = $(this).siblings('.reversion').val();
         if (reversion > 0 && confirm('确定要执行回滚吗?')) {
             $.ajax({
                 url: "/rollback",
                 type: "POST",
                 dataType: "json",
-                data: {"groupid": id, "reversion": reversion},
+                data: {"groupid": groupid, "reversion": reversion},
                 success: function (json) {
-
+                    if (typeof json.Status != 'undefined') {
+                        if (json.Status == true) {
+                            log(groupid, json.Data)
+                        } else {
+                            log(groupid, json.Msg)
+                        }
+                    } else {
+                        console.log(json);
+                        alert('网络错误');
+                    }
                 }
             })
         }
     });
 
+    //onload
     loadData();
 </script>
 </body>

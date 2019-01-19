@@ -4,15 +4,16 @@ import (
 	"path/filepath"
 	"io/ioutil"
 	"encoding/json"
-	"net"
 	"os"
 	"github.com/bwmarrin/snowflake"
+	"flag"
+	"fmt"
 )
 
 type Config struct {
-	ListenHttp string `json:"listen_http"`
-	ListenTcp  string `json:"listen_tcp"`
-	Apps       []Apps `json:"apps"`
+	ListenHttp string          `json:"listen_http"`
+	Apps       []Apps          `json:"apps"`
+	UniqAddr   map[string]bool `json:"-"`
 }
 
 type Apps struct {
@@ -23,27 +24,39 @@ type Apps struct {
 }
 
 type Node struct {
-	Ip          string   `json:"ip"`
-	Type        string   `json:"type"`
-	Path        string   `json:"path"`
-	BeforDeploy string   `json:"befor_deploy"`
-	AfterDeploy string   `json:"after_deploy"`
-	Online      bool     `json:"online,omitempty"`
-	Conn        net.Conn `json:"-"`
+	Alias       string `json:"alias"`
+	Addr        string `json:"addr"`
+	Type        string `json:"type"`
+	Path        string `json:"path"`
+	BeforDeploy string `json:"befor_deploy"`
+	AfterDeploy string `json:"after_deploy"`
+	Online      bool   `json:"online,omitempty"`
 }
 
 var C *Config
+var configUsage = `Usage: /pathto/server -c /pathto/config.json`
 
 func init() {
-	root, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	file := filepath.Join(root, "config.json")
-	C = New(file)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, configUsage+"\n")
+	}
+	file := flag.String("c", "", configUsage)
+	flag.Parse()
+	if *file == "" {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	C = New(*file)
 	node, err := snowflake.NewNode(1)
 	if err != nil {
 		panic(err)
 	}
-	for key := range C.Apps {
+	for key, val := range C.Apps {
 		C.Apps[key].GroupId = node.Generate().String()
+		for _, v := range val.Node {
+			C.UniqAddr[v.Addr] = true
+		}
 	}
 }
 
@@ -61,7 +74,7 @@ func New(file string) *Config {
 		panic(err)
 	}
 
-	c := &Config{}
+	c := &Config{UniqAddr: make(map[string]bool)}
 	return ParseJson(bytes, c)
 }
 
