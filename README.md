@@ -22,7 +22,7 @@ Deploy code to cluster servers based on svn, onekey update onekey rollback
     svn co svn://1.2.3.4/app /data/wwwroot/app
     cd /data/wwwroot/app
     svn up
-    #请确保这一步可以免密登陆
+    #请确保这一步可以免密更新
     ```
     并配置好你的web运行环境，如nginx。
 
