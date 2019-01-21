@@ -1,10 +1,10 @@
 # go-deploy
-Deploy code to cluster servers based on svn, onekey update onekey rollback
+基于SVN的web集群一键部署工具，一键更新、回滚所有集群节点。
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
 
-### 简介
+### 特性
 - 支持多项目、多节点、多环境、分布式环境批量更新和回滚操作
 - 基于goroute的并行操作，上百台节点秒级完成
 - 相比瓦力无需担心免密登陆目标机器造成的安全威胁
