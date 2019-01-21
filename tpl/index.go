@@ -11,6 +11,7 @@ func GetIndexTpl() string {
         table, th, td {border: 1px solid gray; padding: 3px;}
         .reversion{width: 120px;}
         .title {width: 100%;margin: 0 auto;text-align: center; margin-bottom: 0;}
+        .title a {color: #000; text-decoration:none;}
         .clearlog{float: right;font-size: 10px;}
     </style>
     <script src="https://zeptojs.com/zepto.min.js"></script>
@@ -29,10 +30,28 @@ func GetIndexTpl() string {
     </tbody>
     <tfoot>
         <tr><td colspan="5" style="text-align: center;"><span style="color: green">● online</span> <span style="color: red">● offline</span><span class="clearlog"><a href="javascript:void(0);">clear</a></span></td></tr>
-        <tr><td colspan="5"><textarea spellcheck="false" id="log" style="width: 99%; height: 200px;"></textarea></td></tr>
+        <tr><td colspan="5"><textarea spellcheck="false" id="log" style="width: 99%; height: 360px;"></textarea></td></tr>
     </tfoot>
 </table>
 <script>
+    Date.prototype.Format = function (fmt) {
+        var o = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S": this.getMilliseconds()
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
     function loadData() {
         $.ajax({
             url: "/list",
@@ -97,7 +116,7 @@ func GetIndexTpl() string {
     function log(groupid, msg) {
         var tr = $('.gid' + groupid);
         var name = tr.find('td').eq(1).text();
-        $('#log').prepend(msg);
+        $('#log').prepend('['+(new Date()).Format("MM-dd hh:mm:ss")+']' + msg);
     }
 
     $('.clearlog').on('click', function () {
