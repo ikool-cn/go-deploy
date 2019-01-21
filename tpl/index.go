@@ -16,7 +16,7 @@ func GetIndexTpl() string {
     <script src="https://zeptojs.com/zepto.min.js"></script>
 </head>
 <body>
-<div class="title"><h2>go-deploy</h2></div>
+<div class="title"><h2><a href="https://github.com/ikool-cn/go-deploy" target="_blank">go-deploy</a></h2></div>
 <table style="margin: 0 auto">
     <thead>
         <th>Id</th>
@@ -97,7 +97,7 @@ func GetIndexTpl() string {
     function log(groupid, msg) {
         var tr = $('.gid' + groupid);
         var name = tr.find('td').eq(1).text();
-        $('#log').prepend('[' + name + '] ' + msg);
+        $('#log').prepend(msg);
     }
 
     $('.clearlog').on('click', function () {
