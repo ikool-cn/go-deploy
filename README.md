@@ -49,7 +49,7 @@ Deploy code to cluster servers based on svn, onekey update onekey rollback
 ok! 至此就部署完毕了。
 
 ### web管理访问安全问题
- 1. 第一种方案：使用nginx+auth_basic 来保护页面的访问。
+ - 第一种方案：使用nginx+auth_basic 来保护页面的访问。
     通过htpasswd命令生成用户名及对应密码数据库文件
     ```
     htpasswd -c /usr/local/openresty/nginx/conf/vhost/passwd.db yourusername
@@ -66,4 +66,4 @@ ok! 至此就部署完毕了。
              }
          }
     ```
- 2. 第二种方案：每次上线关闭后server。
+ - 第二种方案：每次上线后关闭server。
