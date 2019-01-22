@@ -1,10 +1,10 @@
 # go-deploy
-Deploy code to cluster servers based on svn, onekey update onekey rollback
+基于SVN的web集群一键部署工具，一键更新、回滚所有集群节点。
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
 
-### 简介
+### 特性
 - 支持多项目、多节点、多环境、分布式环境批量更新和回滚操作
 - 基于goroute的并行操作，上百台节点秒级完成
 - 相比瓦力无需担心免密登陆目标机器造成的安全威胁
@@ -49,7 +49,7 @@ Deploy code to cluster servers based on svn, onekey update onekey rollback
 ok! 至此就部署完毕了。
 
 ### web管理访问安全问题
- 1. 第一种方案：使用nginx+auth_basic 来保护页面的访问。
+ - 第一种方案：使用nginx+auth_basic 来保护页面的访问。
     通过htpasswd命令生成用户名及对应密码数据库文件
     ```
     htpasswd -c /usr/local/openresty/nginx/conf/vhost/passwd.db yourusername
@@ -66,4 +66,4 @@ ok! 至此就部署完毕了。
              }
          }
     ```
- 2. 第二种方案：每次上线关闭后server。
+ - 第二种方案：每次上线后关闭server。
