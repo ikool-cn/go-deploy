@@ -7,12 +7,16 @@ func GetIndexTpl() string {
     <meta charset="UTF-8">
     <title>go-deploy</title>
     <style>
-        table {border-collapse: collapse;}
-        table, th, td {border: 1px solid gray; padding: 3px;}
-        .reversion{width: 120px;}
-        .title {width: 100%;margin: 0 auto;text-align: center; margin-bottom: 0;}
-        .title a {color: #000; text-decoration:none;}
-        .clearlog{float: right;font-size: 10px;}
+        body{background-color:#fff;color:#24292e;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;font-size:14px;line-height:1.5}
+        button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}
+        table{border-collapse:collapse;border-spacing:0;display:table}
+        tr{display:table-row;vertical-align:inherit;border-color:inherit}
+        td,th{vertical-align:top;padding:5px;border:1px solid #ddd}
+        textarea{border:1px solid #ccc;border-radius:4px;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}
+        .reversion{width:120px}
+        .title{width:100%;margin:0 auto;text-align:center}
+        .title a{color:#000;text-decoration:none}
+        .clearlog{float:right;font-size:10px}
     </style>
     <script src="https://zeptojs.com/zepto.min.js"></script>
 </head>
@@ -30,7 +34,7 @@ func GetIndexTpl() string {
     </tbody>
     <tfoot>
         <tr><td colspan="5" style="text-align: center;"><span style="color: green">● online</span> <span style="color: red">● offline</span><span class="clearlog"><a href="javascript:void(0);">clear</a></span></td></tr>
-        <tr><td colspan="5"><textarea spellcheck="false" id="log" style="width: 99%; height: 360px;"></textarea></td></tr>
+        <tr><td colspan="5"><textarea spellcheck="false" id="log" style="width: 99%; height: 300px;"></textarea></td></tr>
     </tfoot>
 </table>
 <script>
@@ -116,6 +120,7 @@ func GetIndexTpl() string {
     function log(groupid, msg) {
         var tr = $('.gid' + groupid);
         var name = tr.find('td').eq(1).text();
+        msg = msg || "Empty response from server\n";
         $('#log').prepend('['+(new Date()).Format("MM-dd hh:mm:ss")+']' + msg);
     }
 
