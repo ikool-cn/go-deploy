@@ -11,7 +11,7 @@ func GetIndexTpl() string {
         button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit}
         table{border-collapse:collapse;border-spacing:0;display:table}
         tr{display:table-row;vertical-align:inherit;border-color:inherit}
-        td,th{vertical-align:top;padding:5px;border:1px solid #ddd}
+        td,th{vertical-align:top;padding:5px;border:1px solid #aaa}
         textarea{border:1px solid #ccc;border-radius:4px;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s}
         .reversion{width:120px}
         .title{width:100%;margin:0 auto;text-align:center}
