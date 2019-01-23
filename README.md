@@ -1,17 +1,18 @@
 # go-deploy
-基于SVN的web集群一键部署工具，增量一键更新、一键回滚，上百节点秒级完成，急速web上线工具。
+Golang实现的web集群一键上线工具，增量更新、回滚，100+节点秒级完成部署，正式环境数千次部署稳定安全可靠。
 
 # Screenshot
 ![](https://github.com/ikool-cn/go-deploy/blob/master/Screenshot.png)
 
 ### 特性
-- 支持多项目、多节点、多环境、分布式环境批量更新和回滚操作
-- 基于goroutine并行操作，上百台节点秒级完成
-- 无需SVN账号密码、无需系统账号、无需免密登录目标机 降低安全风险
+- 支持多项目、多节点、多环境、分布式集群环境批量更新和回滚操作
+- 基于goroutine并行操作，上百台节点秒级完成部署
+- 无需svn账号密码、无需免密登录目标机 降低安全风险
 - 每次上线只需增量更新，速度更快
 - server和client采用tcp通讯+心跳保活 节点在线状态实时监控
-- 支持befor_deploy、after_deploy 前置后置行命令，清理缓存、执行重启等操作。 如：sudo service php-fpm reload
-- 管理界面简单、易用、免去复杂的配置
+- 支持befor_deploy、after_deploy 部署前和部署后的hook命令，清理缓存、执行重启等操作。 如：sudo service php-fpm reload
+- 管理界面简单、易用、无需复杂配置。
+- hook命令在服务器节点config.json配置，免去web端配置命令带来的潜在威胁
 
 ### 部署流程
  - 可以自行编译或者直接下载bin下的二进制文件。node节点只用部署client单文件, 管理节点部署server+config.json
