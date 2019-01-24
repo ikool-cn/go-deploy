@@ -69,7 +69,7 @@ func handleConn(conn net.Conn) {
 			break
 		}
 		// output message received
-		log.Print("Message Received:", message)
+		log.Print(conn.RemoteAddr(), " -> Message Received:", message)
 
 		if strings.TrimSpace(message) == "PING" {
 			message = "PONG"
@@ -81,7 +81,7 @@ func handleConn(conn net.Conn) {
 				break
 			}
 		} else {
-			ret, err := processAction(message)
+			ret, err := processTask(message)
 			if err != nil {
 				log.Println("Process error", err)
 				ret = []byte(err.Error())
@@ -100,8 +100,9 @@ func handleConn(conn net.Conn) {
 	}
 }
 
-//process task
-func processAction(message string) ([]byte, error) {
+//git reset --hard 4f32685 || svn up -r 999
+//git pull ||svn up
+func processTask(message string) ([]byte, error) {
 	msg := &Message{}
 	err := json.Unmarshal([]byte(message), msg)
 	if err != nil {
@@ -111,9 +112,17 @@ func processAction(message string) ([]byte, error) {
 
 	var command string
 	if msg.Action == "update" {
-		command = fmt.Sprintf("cd %s && svn up", msg.Path)
+		if msg.Type == "git" {
+			command = fmt.Sprintf("cd %s && git pull", msg.Path)
+		} else {
+			command = fmt.Sprintf("cd %s && svn up", msg.Path)
+		}
 	} else if msg.Action == "rollback" {
-		command = fmt.Sprintf("cd %s && svn up -r %s", msg.Path, msg.Reversion)
+		if msg.Type == "git" {
+			command = fmt.Sprintf("cd %s && git reset --hard %s", msg.Path, msg.Reversion)
+		} else {
+			command = fmt.Sprintf("cd %s && svn up -r %s", msg.Path, msg.Reversion)
+		}
 	}
 
 	if command != "" {

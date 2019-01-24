@@ -3,43 +3,65 @@
   "apps": [
     {
       "name": "douke",
-      "url": "svn://x.x.x.x/douke",
+      "type": "svn",
+      "url": "svn://192.168.1.207/xiaohua",
+      "fetchlogpath": "/data/fetch_log/xiaohua/trunk",
       "node": [
         {
           "alias": "api-1",
           "addr": "192.168.1.11:8081",
-          "type": "svn",
-          "path": "/data/wwwroot/douke/trunk",
+          "path": "/data/wwwroot/xiaohua/trunk",
           "befor_deploy": "",
           "after_deploy": ""
         },
         {
           "alias": "api-2",
           "addr": "192.168.1.207:8081",
-          "type": "svn",
-          "path": "/data/wwwroot/douke/trunk",
+          "path": "/data/wwwroot/xiaohua/trunk",
+          "befor_deploy": "ls /data/wwwroot",
+          "after_deploy": "ls /data/wwwroot/xiaohua/trunk"
+        }
+      ]
+    },
+    {
+      "name": "ymrj",
+      "type": "svn",
+      "url": "svn://192.168.1.207/taoxiaomei",
+      "fetchlogpath": "/data/fetch_log/xiaohua/trunk",
+      "node": [
+        {
+          "alias": "api-1",
+          "addr": "192.168.1.11:8081",
+          "path": "/data/wwwroot/taoxiaomei/trunk/",
+          "befor_deploy": "",
+          "after_deploy": ""
+        },
+        {
+          "alias": "api-2",
+          "addr": "192.168.1.207:8081",
+          "path": "/data/wwwroot/taoxiaomei/trunk/",
           "befor_deploy": "",
           "after_deploy": ""
         }
       ]
     },
     {
-      "name": "ymrj",
-      "url": "svn://x.x.x.x/ymrj",
+      "name": "test-git",
+      "type": "git",
+      "url": "https://gitee.com/ikool/test.git",
+      "fetchlogpath": "/data/fetch_log/test",
       "node": [
         {
           "alias": "api-1",
           "addr": "192.168.1.11:8081",
-          "type": "svn",
-          "path": "/data/wwwroot/ymrj/trunk",
+          "path": "/data/wwwroot/test",
           "befor_deploy": "",
           "after_deploy": ""
         },
         {
           "alias": "api-2",
           "addr": "192.168.1.207:8081",
-          "type": "svn",
-          "path": "/data/wwwroot/ymrj/trunk",
+          "path": "/data/wwwroot/test",
           "befor_deploy": "",
           "after_deploy": ""
         }

@@ -19,11 +19,12 @@ func RunShell(command string) ([]byte, error) {
 	return out, nil;
 }
 
-func JsonResp(status bool, msg string, data interface{}) []byte {
+func JsonResp(status bool, msg string, elapsed string, data interface{}) []byte {
 	bytes, _ := json.Marshal(struct {
-		Status bool
-		Msg    string
-		Data   interface{}
-	}{Status: status, Msg: msg, Data: data})
+		Status  bool
+		Msg     string
+		Elapsed string
+		Data    interface{}
+	}{Status: status, Msg: msg, Elapsed: elapsed, Data: data})
 	return bytes
 }

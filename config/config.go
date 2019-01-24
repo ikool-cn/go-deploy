@@ -17,16 +17,18 @@ type Config struct {
 }
 
 type Apps struct {
-	GroupId string `json:"groupid,omitempty"`
-	Name    string `json:"name"`
-	Url     string `json:"url"`
-	Node    []Node `json:"node"`
+	GroupId      string `json:"groupid,omitempty"`
+	Name         string `json:"name"`
+	Type         string `json:"type"`
+	Url          string `json:"url"`
+	Node         []Node `json:"node"`
+	Fetchlogpath string `json:"fetchlogpath"`
 }
 
 type Node struct {
 	Alias       string `json:"alias"`
 	Addr        string `json:"addr"`
-	Type        string `json:"type"`
+	Type        string `json:"type,omitempty"`
 	Path        string `json:"path"`
 	BeforDeploy string `json:"befor_deploy"`
 	AfterDeploy string `json:"after_deploy"`
@@ -54,8 +56,9 @@ func init() {
 	}
 	for key, val := range C.Apps {
 		C.Apps[key].GroupId = node.Generate().String()
-		for _, v := range val.Node {
+		for k, v := range val.Node {
 			C.UniqAddr[v.Addr] = true
+			C.Apps[key].Node[k].Type = val.Type
 		}
 	}
 }
