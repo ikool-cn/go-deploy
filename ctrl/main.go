@@ -89,7 +89,7 @@ func deply(groupid string) string {
 					}{Type: node.Type, Path: node.Path, BeforDeploy: node.BeforDeploy, AfterDeploy: node.AfterDeploy, Action: "update"})
 
 					chanLen ++
-					go sendAndExecJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
+					go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
 				}
 			}
 
@@ -109,7 +109,7 @@ func deply(groupid string) string {
 }
 
 //send job to client and get execute result
-func sendAndExecJob(jobBody []byte, jobExecChan chan jobExecResult, addr string, appName string, nodeName string) {
+func dispatchJob(jobBody []byte, jobExecChan chan jobExecResult, addr string, appName string, nodeName string) {
 	execResult := jobExecResult{AppName: appName, NodeName: nodeName}
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
@@ -161,7 +161,7 @@ func rollback(groupid string, reversion string) string {
 					}{Type: node.Type, Path: node.Path, BeforDeploy: node.BeforDeploy, AfterDeploy: node.AfterDeploy, Action: "rollback", Reversion: reversion})
 
 					chanLen ++
-					go sendAndExecJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
+					go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
 				}
 			}
 
