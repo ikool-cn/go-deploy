@@ -76,7 +76,7 @@ web集群一键上线工具，支持svn、git。增量更新、回滚，100+服�
 
 ### web管理访问安全问题
  - 部署完后web管理界面直接暴露给所有人的，可以通过以下2种方法来避免被非法访问
-    * 使用nginx+auth_basic 来保护页面的访问。通过htpasswd命令生成用户名及对应密码数据库文件
+    1. 使用nginx+auth_basic 来保护页面的访问。通过htpasswd命令生成用户名及对应密码数据库文件
     ```bash
     htpasswd -c /usr/local/openresty/nginx/conf/vhost/passwd.db yourusername
     ```
@@ -92,6 +92,6 @@ web集群一键上线工具，支持svn、git。增量更新、回滚，100+服�
              }
          }
     ```
-    * 每次使用的时候才启动server
+    2. 每次使用的时候才启动server
     
  - 推荐使用第一种方式
