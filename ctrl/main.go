@@ -1,20 +1,20 @@
 package ctrl
 
 import (
-	"net/http"
-	"fmt"
-	"go-deploy/tpl"
-	"go-deploy/config"
-	"time"
-	"log"
-	"encoding/json"
-	"go-deploy/helper"
-	"strings"
-	"errors"
-	"regexp"
-	"net"
 	"bufio"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"go-deploy/config"
+	"go-deploy/helper"
+	"go-deploy/tmpl"
+	"log"
+	"net"
+	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
+	"time"
 )
 
 var svnlogRegex *regexp.Regexp
@@ -42,7 +42,7 @@ func init() {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "%s\n", tpl.GetIndexTpl())
+	fmt.Fprintf(w, "%s\n", tmpl.GetIndexTpl())
 }
 
 func List(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func deply(groupid string) string {
 						AfterDeploy string `json:"after_deploy"`
 					}{Type: node.Type, Path: node.Path, BeforDeploy: node.BeforDeploy, AfterDeploy: node.AfterDeploy, Action: "update"})
 
-					chanLen ++
+					chanLen++
 					go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
 				}
 			}
@@ -160,7 +160,7 @@ func rollback(groupid string, reversion string) string {
 						AfterDeploy string `json:"after_deploy"`
 					}{Type: node.Type, Path: node.Path, BeforDeploy: node.BeforDeploy, AfterDeploy: node.AfterDeploy, Action: "rollback", Reversion: reversion})
 
-					chanLen ++
+					chanLen++
 					go dispatchJob(jobBody, jobExecChan, node.Addr, app.Name, node.Alias)
 				}
 			}
