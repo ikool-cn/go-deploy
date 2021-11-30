@@ -1,13 +1,13 @@
 package config
 
 import (
-	"path/filepath"
-	"io/ioutil"
 	"encoding/json"
-	"os"
-	"github.com/bwmarrin/snowflake"
 	"flag"
 	"fmt"
+	"github.com/bwmarrin/snowflake"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -36,7 +36,7 @@ type Node struct {
 }
 
 var C *Config
-var configUsage = `Usage: /pathto/server -c /pathto/config.json`
+var configUsage = `Usage: /pathto/server -c /pathto/server.json`
 
 func init() {
 	flag.Usage = func() {
@@ -49,7 +49,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	C = New(*file)
+	C = NewConfig(*file)
 	node, err := snowflake.NewNode(1)
 	if err != nil {
 		panic(err)
@@ -63,7 +63,7 @@ func init() {
 	}
 }
 
-func New(file string) *Config {
+func NewConfig(file string) *Config {
 	if !filepath.IsAbs(file) {
 		absFile, err := filepath.Abs(file)
 		if err != nil {

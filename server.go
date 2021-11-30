@@ -1,13 +1,13 @@
 package main
 
 import (
-	"time"
-	"log"
-	"net/http"
-	"go-deploy/ctrl"
-	"go-deploy/config"
-	"net"
 	"bufio"
+	"go-deploy/config"
+	"go-deploy/ctrl"
+	"log"
+	"net"
+	"net/http"
+	"time"
 )
 
 func main() {
@@ -48,13 +48,17 @@ func main() {
 func Ping(addr string) {
 	for {
 		func() {
-			// connect to this socket
+			//connect to this socket
 			conn, err := net.Dial("tcp", addr)
 			if err != nil {
 				log.Println("Error connect to client:", err)
 				return
 			}
+
+			//connect success
 			setClientOnlineStatus(addr, true)
+
+			//remote client closed
 			defer func() {
 				setClientOnlineStatus(addr, false)
 				conn.Close()

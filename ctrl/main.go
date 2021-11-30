@@ -121,7 +121,7 @@ func dispatchJob(jobBody []byte, jobExecChan chan jobExecResult, addr string, ap
 	defer conn.Close()
 
 	jobBody = append(jobBody, '\n')
-	conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
+	conn.SetWriteDeadline(time.Now().Add(30 * time.Second))
 	_, err = conn.Write(jobBody)
 	if err != nil {
 		log.Println("Error writing to stream:", err)
