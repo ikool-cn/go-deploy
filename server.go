@@ -22,8 +22,8 @@ func main() {
 	s := &http.Server{
 		Addr:           config.C.ListenHttp,
 		Handler:        http.DefaultServeMux,
-		ReadTimeout:    3 * time.Second,
-		WriteTimeout:   3 * time.Second,
+		ReadTimeout:    30 * time.Second,
+		WriteTimeout:   30 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 	go func() {
