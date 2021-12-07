@@ -97,9 +97,9 @@ func deply(groupid string) string {
 			for i := 0; i < chanLen; i++ {
 				exeRet := <-jobExecChan
 				if exeRet.Err != nil {
-					resp += fmt.Sprintf("[%s:%s]ERROR => %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
+					resp += fmt.Sprintf("[%s:%s]\nERROR: %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
 				} else {
-					resp += fmt.Sprintf("[%s:%s]%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
+					resp += fmt.Sprintf("[%s:%s]\n%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
 				}
 			}
 			return resp
@@ -169,9 +169,9 @@ func rollback(groupid string, reversion string) string {
 			for i := 0; i < chanLen; i++ {
 				exeRet := <-jobExecChan
 				if exeRet.Err != nil {
-					resp += fmt.Sprintf("[%s:%s]ERROR => %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
+					resp += fmt.Sprintf("[%s:%s]\nERROR: %s", exeRet.AppName, exeRet.NodeName, exeRet.Err.Error())
 				} else {
-					resp += fmt.Sprintf("[%s:%s]%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
+					resp += fmt.Sprintf("[%s:%s]\n%s", exeRet.AppName, exeRet.NodeName, exeRet.Message)
 				}
 			}
 			return resp
